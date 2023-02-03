@@ -167,35 +167,21 @@ public class CommandLineJobReader {
                 .build();
     }
 
-    //extra for analysis mode
-    private void ensureOutputFormatGetsOverwrittenByCommandline(JobProto.Job.Builder jobBuilder, CommandLine commandline){
-        if (!jobBuilder.getOutputOptions().getOutputFormatsList().isEmpty()) {
-            logger.info("list is not empty:" +  jobBuilder.getOutputOptions().getOutputFormatsList());
-            String[] formatValues = commandline.getOptionValues("output-format");
-            handleOutputFormat(formatValues, jobBuilder);
-        }
-    }
-
-
     private void handleOutputFormat(String[] outputFormatStrings, JobProto.Job.Builder jobBuilder) {
-        // first two lines make sure to override any settings from an analysis file referring to other output_formats
+        // override any settings from an analysis file referring to other output_formats
         OutputProto.OutputOptions.Builder optionsBuilder = jobBuilder.getOutputOptionsBuilder();
         optionsBuilder.clearOutputFormats();
         for (String outputFormatString : outputFormatStrings) {
             outputFormatString = outputFormatString.toUpperCase();
-            // Try to match the output format string with an OutputFormat enum constant, null is placeholder
+            // Try to match the output format string with an OutputFormat enum constant
             OutputFormat outputFormat = null;
             try {
                 outputFormat = OutputFormat.valueOf(outputFormatString);
             } catch (IllegalArgumentException e) {
-                // If there is no matching OutputFormat enum constant, log a warning
-                // maybe should be modified
                 logger.warn("Unknown output format: " + outputFormatString + "has been cleared from the list");
             }
-            // If the output format string was successfully matched with an OutputFormat enum constant, add it to the job
             if (outputFormat != null) {
                 jobBuilder.getOutputOptionsBuilder().addOutputFormats(outputFormat.name());
-//                OutputProto.OutputOptions options = OutputProto.OutputOptions.newBuilder()
             }
         }
     }

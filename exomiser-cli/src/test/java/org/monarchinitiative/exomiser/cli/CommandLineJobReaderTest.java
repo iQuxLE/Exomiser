@@ -25,6 +25,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.protobuf.Timestamp;
 import de.charite.compbio.jannovar.mendel.SubModeOfInheritance;
 import org.apache.commons.cli.CommandLine;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.monarchinitiative.exomiser.api.v1.AnalysisProto;
@@ -46,6 +47,7 @@ import java.time.Instant;
 import java.util.List;
 
 import static de.charite.compbio.jannovar.annotation.VariantEffect.*;
+import static org.assertj.core.api.AssertionsForClassTypes.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
@@ -297,22 +299,19 @@ class CommandLineJobReaderTest {
 
     @Test
     void testOutputFormatOptionToOverwriteAnalysis() {
-        // the test-analysis-exome file contains all output_options and gets overwritten during readJobs if a
-        // cmdLine argument with --output_option is given
-        CommandLine cmdLine = CommandLineOptionsParser.parse("--analysis", "src/test/resources/test-analysis-exome.yml", "--output-format", "HTML");
-        List<JobProto.Job> jobs = instance.readJobs(cmdLine);
-        // assertThat it has the Option is done by parser
+        // the test-analysis-exome file contains all output_options and gets overwritten with HTML
+        CommandLine commandLine = CommandLineOptionsParser.parse("--analysis", "src/test/resources/test-analysis-exome.yml", "--output-format", "HTML");
+        List<JobProto.Job> jobs = instance.readJobs(commandLine);
         for (JobProto.Job job: jobs) {
             List<String> formats = job.getOutputOptions().getOutputFormatsList();
             assertThat(formats, equalTo(List.of("HTML")));
         }
     }
 
-
     @Test
     void testGivenNoOutputFormatDoesNotOverrideAnalysisWithDefaultOutputFormat() {
-        CommandLine cmdLine = CommandLineOptionsParser.parse("--analysis", "src/test/resources/test-analysis-exome.yml");
-        List<JobProto.Job> jobs = instance.readJobs(cmdLine);
+        CommandLine commandLine = CommandLineOptionsParser.parse("--analysis", "src/test/resources/test-analysis-exome.yml");
+        List<JobProto.Job> jobs = instance.readJobs(commandLine);
         for (JobProto.Job job: jobs) {
             List<String> formats = job.getOutputOptions().getOutputFormatsList();
             assertThat(formats, containsInAnyOrder("HTML", "TSV_GENE", "JSON", "TSV_VARIANT", "VCF") );
@@ -321,16 +320,14 @@ class CommandLineJobReaderTest {
 
     @Test
     void testIllegalOutputFormatArguments() {
-        CommandLine cmdLine = CommandLineOptionsParser.parse("--analysis", "src/test/resources/test-analysis-exome.yml", "--output-format", "HTML,FOO,BRAIN");
-        List<JobProto.Job> jobs = instance.readJobs(cmdLine);
-        // assertThat it has the Option is done by parser
+        CommandLine commandLine = CommandLineOptionsParser.parse("--analysis", "src/test/resources/test-analysis-exome.yml", "--output-format", "HTML,FOO,BAR");
+        List<JobProto.Job> jobs = instance.readJobs(commandLine);
         for (JobProto.Job job: jobs) {
             List<String> formats = job.getOutputOptions().getOutputFormatsList();
             assertThat(formats, containsInAnyOrder("HTML"));
+            assertThat(formats, Matchers.not(containsInAnyOrder("FOO", "BAR")));
         }
     }
-
-
 
     @Test
     void readIllegalAnalysisOutputNoSampleCombination() {

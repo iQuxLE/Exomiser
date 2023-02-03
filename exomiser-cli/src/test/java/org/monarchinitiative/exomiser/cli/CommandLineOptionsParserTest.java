@@ -93,16 +93,16 @@ class CommandLineOptionsParserTest {
     @Test
     void parseIllegalMissingAssemblyAnalysisVcfCombination() {
         assertThrows(CommandLineParseError.class, () -> CommandLineOptionsParser.parse(
-                "--analysis", resource("pfeiffer-analysis-v8-12.yml"),
-                "--vcf", resource("Pfeiffer.vcf")),
+                        "--analysis", resource("pfeiffer-analysis-v8-12.yml"),
+                        "--vcf", resource("Pfeiffer.vcf")),
                 "--assembly option required when specifying vcf!");
     }
 
     @Test
     void parseIllegalAssemblyValue() {
         assertThrows(CommandLineParseError.class, () -> CommandLineOptionsParser.parse(
-                "--sample", resource("pfeiffer-job-sample.yml"),
-                "--assembly", "wibble"),
+                        "--sample", resource("pfeiffer-job-sample.yml"),
+                        "--assembly", "wibble"),
                 "'wibble' is not a valid/supported genome assembly."
         );
     }
@@ -149,20 +149,28 @@ class CommandLineOptionsParserTest {
     }
 
     @Test
-    void parseSampleAndVcfAndOutputFormat() {
+    void parseSampleAndVcf() {
         CommandLine commandLine = CommandLineOptionsParser.parse(
                 "--sample", resource("exome-analysis.yml"),
                 "--vcf", resource("Pfeiffer.vcf"),
-                "--assembly", "hg19",
-                "--output-format", "TSV_GENE,JSON,HTML,TSV_VARIANT,FOO");
+                "--assembly", "hg19");
         assertTrue(commandLine.hasOption("sample"));
         assertThat(commandLine.getOptionValue("sample"), equalTo(resource("exome-analysis.yml")));
         assertTrue(commandLine.hasOption("vcf"));
         assertThat(commandLine.getOptionValue("vcf"), equalTo(resource("Pfeiffer.vcf")));
         assertTrue(commandLine.hasOption("assembly"));
         assertThat(commandLine.getOptionValue("assembly"), equalTo("hg19"));
+    }
+
+    @Test
+    void parseOutputFormat() {
+        CommandLine commandLine = CommandLineOptionsParser.parse(
+                "--sample", resource("exome-analysis.yml"),
+                "--vcf", resource("Pfeiffer.vcf"),
+                "--assembly", "hg19",
+                "--output-format", "TSV_GENE,JSON,HTML,TSV_VARIANT");
         assertTrue(commandLine.hasOption("output-format"));
-        assertThat(Arrays.asList(commandLine.getOptionValues("output-format")), containsInAnyOrder("TSV_GENE", "JSON", "HTML", "TSV_VARIANT", "FOO"));
+        assertThat(Arrays.asList(commandLine.getOptionValues("output-format")), containsInAnyOrder("TSV_GENE", "JSON", "HTML", "TSV_VARIANT"));
     }
 
     @Test
