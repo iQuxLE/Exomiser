@@ -284,7 +284,6 @@ public class AnalysisParser {
             return outputPrefix;
         }
 
-        // how am I supposed to overwrite this, lol
         private Set<OutputFormat> parseOutputFormats(Map<String, List<String>> analysisMap) {
             List<String> givenOutputFormats = analysisMap.getOrDefault("outputFormats", Collections.emptyList());
             if (givenOutputFormats == null || givenOutputFormats.isEmpty()) {
