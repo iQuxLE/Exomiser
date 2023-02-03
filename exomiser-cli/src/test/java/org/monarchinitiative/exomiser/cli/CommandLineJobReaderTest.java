@@ -47,7 +47,6 @@ import java.time.Instant;
 import java.util.List;
 
 import static de.charite.compbio.jannovar.annotation.VariantEffect.*;
-import static org.assertj.core.api.AssertionsForClassTypes.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
@@ -299,7 +298,7 @@ class CommandLineJobReaderTest {
 
     @Test
     void testOutputFormatOptionToOverwriteAnalysis() {
-        // the test-analysis-exome file contains all output_options and gets overwritten with HTML
+        // the test-analysis-exome.yml file contains all output_options and gets overwritten with HTML
         CommandLine commandLine = CommandLineOptionsParser.parse("--analysis", "src/test/resources/test-analysis-exome.yml", "--output-format", "HTML");
         List<JobProto.Job> jobs = instance.readJobs(commandLine);
         for (JobProto.Job job: jobs) {
