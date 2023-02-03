@@ -20,7 +20,6 @@
 
 package org.monarchinitiative.exomiser.cli;
 
-import com.google.protobuf.ByteString;
 import com.google.protobuf.Message;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
@@ -28,7 +27,6 @@ import org.monarchinitiative.exomiser.api.v1.AnalysisProto;
 import org.monarchinitiative.exomiser.api.v1.JobProto;
 import org.monarchinitiative.exomiser.api.v1.OutputProto;
 import org.monarchinitiative.exomiser.api.v1.SampleProto;
-import org.monarchinitiative.exomiser.core.analysis.Analysis;
 import org.monarchinitiative.exomiser.core.analysis.JobReader;
 import org.monarchinitiative.exomiser.core.analysis.sample.PhenopacketPedigreeReader;
 import org.monarchinitiative.exomiser.core.genome.GenomeAssembly;
