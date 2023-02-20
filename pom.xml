@@ -39,6 +39,7 @@
         </license>
     </licenses>
 
+
     <developers>
         <developer>
             <name>Jules Jacobsen</name>
@@ -98,10 +99,9 @@
         <guava.version>31.1-jre</guava.version>
         <protobuf.version>3.18.2</protobuf.version>
         <spring-boot.version>2.6.9</spring-boot.version>
-        <docker.base.image>
-            gcr.io/distroless/java17@sha256:ab37242e81cbc031b2600eef4440fe87055a05c14b40686df85078cc5086c98f
-        </docker.base.image>
+        <docker.base.image>docker.io/eclipse-temurin:17.0.6_10-jre-jammy@sha256:0563afe1aa8e2bfbf68c8ef633d67839321b8bd0a8d163f0dff2dfedef04af29</docker.base.image>
     </properties>
+
  
     <repositories>
         <repository>
@@ -316,6 +316,34 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <profile>
+            <id>docker:arm64v8</id>
+            <properties>
+<!--                DIGEST for arm64v8-->
+                <docker.base.image>eclipse-temurin:17.0.6_10-jre-jammy@sha256:0563afe1aa8e2bfbf68c8ef633d67839321b8bd0a8d163f0dff2dfedef04af29</docker.base.image>
+            </properties>
+        </profile>
+        <profile>
+            <id>docker:noShell</id>
+            <properties>
+                <docker.base.image>gcr.io/distroless/java17@sha256:ab37242e81cbc031b2600eef4440fe87055a05c14b40686df85078cc5086c98f</docker.base.image>
+            </properties>
+        </profile>
+        <profile>
+            <id>docker:arm64</id>
+            <properties>
+<!--                DIGEST for amd64-->
+                <docker.base.image>eclipse-temurin:17.0.6_10-jre-jammy@sha256:411be546ecd4e8841ecd4bf82dac7212153fc0e21949eb84cb3022de304401c2</docker.base.image>
+            </properties>
+        </profile>
+        <profile>
+            <id>docker:amd64</id>
+            <properties>
+<!--                DIGEST for arm64-->
+                <docker.base.image>eclipse-temurin:17.0.6_10-jre@sha256:592f2d372afeb13bc3c5a28e49c7ca6b5e5688e767cb0b9e21a70caaacfc4cec
+                </docker.base.image>
+            </properties>
         </profile>
     </profiles>
 </project>

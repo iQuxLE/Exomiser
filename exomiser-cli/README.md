@@ -168,7 +168,23 @@ and can be checked by typing:
 
 This shouldn't be an issue with more recent linux distributions.
 
+------
 ## Docker images with jib
+
+### Selecting the correct architecture for the Docker image
+We offer different docker image builds for different system architectures.
+You can select out of `arm64`(default), `amd64`  and `arm64/v8` and you would need to specify them during the building
+process of Maven.
+```shell
+mvn clean install -P <profileID>
+```
+
+| profileID      | architecture |
+|----------------|--------------|
+| `docker:arm64` | arm64        |
+| `docker:amd64` | amd64        |
+| `docker:arm64v8` | arm64/v8   |
+
 
 Docker images are build using [jib](https://github.com/GoogleContainerTools/jib/tree/master/jib-maven-plugin#quickstart)
 which does not require a Docker daemon to be running/installed in order to build an image. Tar images are built by
@@ -180,36 +196,19 @@ Tar images can be installed locally like so and will create a Docker image:
 $ docker load --input  Exomiser/exomiser-cli/target/jib-image.tar
 $ docker image list
 REPOSITORY                       TAG              IMAGE ID      CREATED         SIZE
-localhost/exomiser-cli           latest           c12b1878a8f3  52 years ago    273 MB
-localhost/exomiser-cli           ${project.version} c12b1878a8f3  52 years ago    273 MB
+exomiser-cli           latest           c12b1878a8f3  52 years ago    273 MB
+exomiser-cli           ${project.version} c12b1878a8f3  52 years ago    273 MB
 ```
 
-To run the image you will need the standard exomiser directory layout to mount as separate volumes as in the cli and
-supply an `application.properties` file or environmental variables to point to the data required _e.g._
+### Activate the docker image
+
+All images have a bash-shell to run Nextflow pipelines in combination with Exomiser.
+Running the image with the following command will open the shell and create volumes with
+links to the exomiser data.
 
 ```shell
-docker run -v "/data/exomiser-data:/exomiser-data" \
- -v "/opt/exomiser/exomiser-config/:/exomiser"  \
- -v "/opt/exomiser/exomiser-cli-${project.version}/results:/results"  \
- localhost/exomiser-cli:${project.version}  \
- --analysis /exomiser/test-analysis-exome.yml  \
- --vcf /exomiser/Pfeiffer.vcf.gz  \
- --spring.config.location=/exomiser/application.properties
-```
-
-or using Spring configuration arguments instead of the `application.properties`:
-
-```shell
-docker run -v "/data/exomiser-data:/exomiser-data" \
- -v "/opt/exomiser/exomiser-config/:/exomiser"  \
- -v "/opt/exomiser/exomiser-cli-${project.version}/results:/results"  \
- localhost/exomiser-cli:${project.version}  \
- --analysis /exomiser/test-analysis-exome.yml  \
- --vcf /exomiser/Pfeiffer.vcf.gz  \
- # minimal requirements for an hg19 exome sample
- --exomiser.data-directory=/exomiser-data \
- --exomiser.hg19.data-version=2109 \
- --exomiser.phenotype.data-version=2109
+docker run -v "path/to/data/exomiser-data:/exomiser-data" \
+ -v "/opt/exomiser/exomiser-config/:/exomiser"
 ```
 
 Here the contents of `/opt/exomiser/exomiser-config` is simply the `application.properties` file and the example files
@@ -223,3 +222,36 @@ exomiser-config/
 ├── Pfeiffer.vcf.gz.tbi
 └── test-analysis-exome.yml
 ```
+
+### Running Exomiser from the docker container
+After running the following commands Exomiser will be started from the containers shell.
+
+```shell
+1. source enable_exomiser.sh
+2. bash enable_exomiser.sh
+3. exomiser --analysis /exomiser/test-analysis-exome.yml \
+ --spring.config.location=/exomiser/application.properties
+```
+
+or using Spring configuration arguments instead of the `application.properties`:
+
+```shell
+ exomiser --analysis /exomiser/test-analysis-exome.yml  \
+ # minimal requirements for an hg19 exome sample
+ --exomiser.data-directory=/exomiser-data \
+ --exomiser.hg19.data-version=2209 \
+ --exomiser.phenotype.data-version=2209
+```
+
+To run the image you will need the standard exomiser directory layout to mount as separate volumes as in the cli and
+supply an `application.properties` file or environmental variables to point to the data required _e.g._
+
+Keep in mind to update your `application.properties` to point the data to the location
+inside the container, like:
+
+```application.properties
+exomiser.data-directory=/exomiser-data
+```
+
+
+
